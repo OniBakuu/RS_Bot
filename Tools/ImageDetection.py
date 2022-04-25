@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import pyautogui
+import ScreenGrab
 
 
 def template_match():
@@ -26,26 +27,16 @@ def template_match():
 
 
 def get_contours():
-    img_rgb = cv.imread('colorTest2.jpg')
+    """Gets contours of objects on screen"""
+    img_rgb = ScreenGrab.grab_screen()
 
-    # Purple bound
+    # Purple contour
     lower_purp = np.array([130, 50, 130])
     upper_purp = np.array([190, 90, 190])
 
     purple = cv.inRange(img_rgb, lower_purp, upper_purp)
 
     contours, _ = cv.findContours(purple, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-
-    '''for c in contours:
-        centroid = cv.moments(c)
-        if centroid["m00"] != 0:
-            cX = int(centroid["m10"] / centroid["m00"])
-            cY = int(centroid["m01"] / centroid["m00"])
-            #cv.circle(img_rgb, (cX, cY), 7, (255, 255, 255), 34)
-        else:
-            cX, cY = 0, 0
-
-        cv.drawContours(img_rgb, [c], -1, (255, 255, 255), 5)'''
 
     # cv.imshow('detection', img_rgb)
     # cv.waitKey(0)
@@ -77,7 +68,7 @@ def get_closet_marked_object():
 
 def click_at_coord(click_x, click_y, left_click=True):
     """Moves and clicks at given coord"""
-    pyautogui.moveTo(click_x, click_y, 2.5)
+    pyautogui.moveTo(click_x, click_y, 1.5)
 
     if left_click:
         pyautogui.leftClick(click_x, click_y)
@@ -86,4 +77,4 @@ def click_at_coord(click_x, click_y, left_click=True):
 
 
 x, y = get_closet_marked_object()
-click_at_coord(x, y, False)
+click_at_coord(x, y)
