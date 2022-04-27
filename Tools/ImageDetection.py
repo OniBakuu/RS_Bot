@@ -1,7 +1,11 @@
+import random
+
 import cv2 as cv
 import numpy as np
-import pyautogui
-import ScreenGrab
+import pyautogui as pyg
+import Tools.MouseJitters as mj
+import time
+import Tools.ScreenGrab as screengrab
 
 
 def template_match():
@@ -26,15 +30,16 @@ def template_match():
     cv.waitKey(0)
 
 
-def get_contours():
+def get_object_contours():
     """Gets contours of objects on screen"""
-    img_rgb = ScreenGrab.grab_screen()
+    img_rgb = screengrab.grab_screen()
+    hsv = cv.cvtColor(img_rgb, cv.COLOR_BGR2HSV)
 
-    # Purple contour
-    lower_purp = np.array([130, 50, 130])
-    upper_purp = np.array([190, 90, 190])
+    # blue contour
+    lower_blue = np.array([120, 60, 50])
+    upper_blue = np.array([130, 255, 255])
 
-    purple = cv.inRange(img_rgb, lower_purp, upper_purp)
+    purple = cv.inRange(hsv, lower_blue, upper_blue)
 
     contours, _ = cv.findContours(purple, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
@@ -43,10 +48,27 @@ def get_contours():
     return contours
 
 
+def test_contour_matching():
+    img_rgb = screengrab.grab_screen()
+    hsv = cv.cvtColor(img_rgb, cv.COLOR_BGR2HSV)
+
+    lower_blue = np.array([120, 60, 50])
+    upper_blue = np.array([130, 255, 255])
+
+    blue = cv.inRange(hsv, lower_blue, upper_blue)
+    conts, _ = cv.findContours(blue, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    print(len(conts))
+    for c in conts:
+        cv.drawContours(img_rgb, [c], -1, (0, 255, 0), 5)
+
+    cv.imshow('detect', img_rgb)
+    cv.waitKey(0)
+
+
 def get_closet_marked_object():
     screen_center_x = 2560/2
     screen_center_y = 1440/2
-    contours = get_contours()
+    contours = get_object_contours()
 
     distance = []
 
@@ -63,18 +85,24 @@ def get_closet_marked_object():
 
     if distance[0] < 100:
         return []
+
     return[x_center, y_center]
+
+
+def click_path():
+    path = [[1321, 152], [1747, 177], [773, 631]]
+    for point in path:
+        print(point[0], ":", point[1])
+        click_at_coord(point[0], point[1])
+        time.sleep(10)
 
 
 def click_at_coord(click_x, click_y, left_click=True):
     """Moves and clicks at given coord"""
-    pyautogui.moveTo(click_x, click_y, 1.5)
+    mj.move_bezier(click_x, click_y, False)
 
     if left_click:
-        pyautogui.leftClick(click_x, click_y)
+        pyg.leftClick(click_x, click_y)
     else:
-        pyautogui.rightClick(click_x, click_y)
+        pyg.rightClick(click_x, click_y)
 
-
-x, y = get_closet_marked_object()
-click_at_coord(x, y)
