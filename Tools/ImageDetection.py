@@ -8,18 +8,18 @@ import time
 import Tools.ScreenGrab as screengrab
 
 
-def template_match():
-    img_rgb = cv.imread('colorContourTest.jpg')
+def template_match_test():
+    img_rgb = screengrab.grab_chat()
 
     img_gray = cv.cvtColor(img_rgb, cv.COLOR_BGR2GRAY)
 
-    template1 = cv.imread('levelButton.jpg', 0)
-
+    #template1 = cv.imread('A:/Jaeger/UnityProjects/RS_Bot/PathImages/VarrockEastBank_VarrockEastTrees/landmark_0.png', 0)
+    template1 = cv.imread('A:/Jaeger/UnityProjects/RS_Bot/Tools/invFull.png', 0)
     w, h = template1.shape[::-1]
 
     result = cv.matchTemplate(img_gray, template1, cv.TM_CCOEFF_NORMED)
 
-    thresh = .9
+    thresh = .8
 
     locCoord = np.where(result >= thresh)
 
@@ -28,6 +28,48 @@ def template_match():
 
     cv.imshow('Detected', img_rgb)
     cv.waitKey(0)
+
+
+def get_map_coord(file):
+    """Gets the coord of matched point on minimap"""
+    print(file)
+    mini_map = screengrab.grab_minimap()
+    map_gray = cv.cvtColor(mini_map, cv.COLOR_BGR2GRAY)
+    img = cv.imread(file, 0)
+
+    w, h = img.shape[::-1]
+    result = cv.matchTemplate(map_gray, img, cv.TM_CCOEFF_NORMED)
+    thresh = .7
+    coord = np.where(result >= thresh)
+
+    for pt in zip(*coord[::-1]):
+        cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 255), 2)
+        print("here")
+        point = [(pt[0] + w/2), (pt[1] + h/2)]
+        print(point)
+        return point
+
+
+def get_template_coord(img_path, chat=False):
+    screen = screengrab.grab_screen()
+    if chat:
+        screen = screengrab.grab_chat()
+    screen = cv.cvtColor(screen, cv.COLOR_BGR2GRAY)
+    img = cv.imread(img_path, 0)
+
+    w, h = img.shape[::-1]
+    result = cv.matchTemplate(screen, img, cv.TM_CCOEFF_NORMED)
+    thresh = .8
+    coord = np.where(result >= thresh)
+    if chat:
+        if np.amax(result) >= thresh:
+            return True
+
+    for pt in zip(*coord[::-1]):
+        cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 255), 2)
+        point = [(pt[0] + w / 2), (pt[1] + h / 2)]
+        print(point)
+        return point
 
 
 def get_object_contours():
@@ -66,6 +108,7 @@ def test_contour_matching():
 
 
 def get_closet_marked_object():
+    """Gets coord of the closest object marked in Runelite"""
     screen_center_x = 2560/2
     screen_center_y = 1440/2
     contours = get_object_contours()
@@ -89,14 +132,6 @@ def get_closet_marked_object():
     return[x_center, y_center]
 
 
-def click_path():
-    path = [[1321, 152], [1747, 177], [773, 631]]
-    for point in path:
-        print(point[0], ":", point[1])
-        click_at_coord(point[0], point[1])
-        time.sleep(10)
-
-
 def click_at_coord(click_x, click_y, left_click=True):
     """Moves and clicks at given coord"""
     mj.move_bezier(click_x, click_y, False)
@@ -106,3 +141,31 @@ def click_at_coord(click_x, click_y, left_click=True):
     else:
         pyg.rightClick(click_x, click_y)
 
+
+def clear_game_chat():
+    click_at_coord(139, 1381, False)
+    pyg.leftClick(134, 1335, duration=.5)
+
+
+def check_inv_full():
+    path = 'A:/Jaeger/UnityProjects/RS_Bot/Tools/invFull.png'
+    print("here")
+    try:
+        if get_template_coord(path, True):
+            return True
+    except TypeError:
+        return False
+    except AttributeError:
+        return False
+
+
+def bank_handling():
+    """Deposits everything in inventory"""
+    x, y = get_closet_marked_object()
+    click_at_coord(x, y)
+    click_at_coord(1342, 1110)
+    time.sleep(random.uniform(1, 1.5))
+    click_at_coord(1414, 48)
+    time.sleep(random.uniform(1, 1.5))
+
+template_match_test()

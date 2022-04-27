@@ -13,12 +13,17 @@ def grab_screen():
 def grab_minimap():
     pyg.screenshot("minimap.png", (2200, 23, 320, 285))
     img = cv.imread("minimap.png")
-    cv.imshow('map', img)
-    cv.waitKey(0)
+    return img
+
+
+def grab_chat():
+    pyg.screenshot("chatbox.png", (0, 1150, 776, 210))
+    img = cv.imread("chatbox.png")
+    return img
 
 
 def get_mouse_coords():
     print(pyg.position())
 
 
-grab_minimap()
+get_mouse_coords()

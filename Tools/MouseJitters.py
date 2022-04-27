@@ -34,6 +34,6 @@ def move_bezier(click_x, click_y, wiggle=True):
             mouse.move(pt[0], pt[1], duration=duration)
 
 
-def realistic_click():
+def realistic_click(x, y):
     pass
 
