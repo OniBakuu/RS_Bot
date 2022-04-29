@@ -4,7 +4,7 @@ import random
 import mouse
 
 
-def move_bezier(click_x, click_y, wiggle=True):
+def move_bezier(click_x, click_y, wiggle=True, min_duration=.01, max_duration=.045):
     """
     Moves mouse in a Bézier curve to desired point.
     Also adds some variance to curve y values to un-smooth the line
@@ -22,18 +22,17 @@ def move_bezier(click_x, click_y, wiggle=True):
     x, y = points[:, 0], points[:, 1]
     move_points = tuple(zip(x, y))
 
-    duration = random.uniform(.01, .045)
+    duration = random.uniform(min_duration, max_duration)
+
     if wiggle:
         for pt in move_points:
-            if pt == move_points.index(len(move_points)-1):
-                mouse.move(pt[0], pt[1], duration=duration)
-            else:
-                mouse.move(pt[0], pt[1] + random.uniform(0, 15), duration=duration)
+            mouse.move(pt[0], pt[1] + random.uniform(0, 10), duration=duration)
     else:
         for pt in move_points:
             mouse.move(pt[0], pt[1], duration=duration)
 
 
 def realistic_click(x, y):
+    # Chances to double click or right click
     pass
 

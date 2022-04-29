@@ -44,7 +44,6 @@ def get_map_coord(file):
 
     for pt in zip(*coord[::-1]):
         cv.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 255), 2)
-        print("here")
         point = [(pt[0] + w/2), (pt[1] + h/2)]
         print(point)
         return point
@@ -132,9 +131,9 @@ def get_closet_marked_object():
     return[x_center, y_center]
 
 
-def click_at_coord(click_x, click_y, left_click=True):
+def click_at_coord(click_x, click_y, left_click=True, min_duration=.01, max_duration=.045):
     """Moves and clicks at given coord"""
-    mj.move_bezier(click_x, click_y, False)
+    mj.move_bezier(click_x, click_y, min_duration=min_duration, max_duration=max_duration)
 
     if left_click:
         pyg.leftClick(click_x, click_y)
@@ -149,7 +148,6 @@ def clear_game_chat():
 
 def check_inv_full():
     path = 'A:/Jaeger/UnityProjects/RS_Bot/Tools/invFull.png'
-    print("here")
     try:
         if get_template_coord(path, True):
             return True
@@ -168,4 +166,4 @@ def bank_handling():
     click_at_coord(1414, 48)
     time.sleep(random.uniform(1, 1.5))
 
-template_match_test()
+# template_match_test()

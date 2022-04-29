@@ -2,6 +2,9 @@ import random
 import time
 from Tools import ImageDetection as id
 from PathImages import Path
+from Tools import Breaks
+
+brek = Breaks.DoBreaks()
 
 
 def cut_wood():
@@ -15,6 +18,8 @@ def cut_wood():
             Path.walk_VEB_VET_path()
 
         time.sleep(random.randint(10, 15))
+
+    # Do your break and then resume maybe log off and then relog
 
 
 cut_wood()
